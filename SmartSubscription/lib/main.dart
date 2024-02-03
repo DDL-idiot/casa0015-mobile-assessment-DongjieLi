@@ -41,11 +41,11 @@ class MyApp extends StatelessWidget {
 
 class MainListView extends StatelessWidget {
   final List<Widget> apps = [
-    Text('Apple Music                    £5.99'),
-    Text('Amazon                          £47.49'),
-    Text('Google Drive                   £8.99'),
-    Text('iCloud                           £5.99'),
-    Text('Netflix                          £17.99'),
+    Text('Apple Music                                          £5.99🔔'),
+    Text('Amazon                                               £47.49✅'),
+    Text('Google Drive                                         £8.99✅'),
+    Text('iCloud                                                    £5.99✅'),
+    Text('Netflix                                                  £17.99🔔'),
   ];
   @override
   Widget build(BuildContext context) {
