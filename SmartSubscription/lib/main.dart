@@ -1,54 +1,98 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a purple toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromARGB(255, 30, 132, 210)),
-          useMaterial3: false,
-        ),
-        home: Scaffold(
-          appBar: AppBar(title: Text('Subscription Home')),
-          body: MainListView(),
-        ));
+      title: 'Smart Subscriptions',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MainScreen(),
+    );
   }
 }
 
-class MainListView extends StatelessWidget {
-  final List<Widget> apps = [
-    Text('Apple Music                                          £5.99🔔'),
-    Text('Amazon                                               £47.49✅'),
-    Text('Google Drive                                         £8.99✅'),
-    Text('iCloud                                                    £5.99✅'),
-    Text('Netflix                                                  £17.99🔔'),
+class MainScreen extends StatefulWidget {
+  MainScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 1; // 默认选中Home
+
+  static final List<Widget> _widgetOptions = <Widget>[
+    PersonalCenter(),
+    SubscriptionList(), // 使用之前定义的list
+    CommunityNews(),
   ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Smart Subscriptions'),
+      ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Personal',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.forum),
+            label: 'Community',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blueAccent,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class PersonalCenter extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text('Personal Center');
+  }
+}
+
+class SubscriptionList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 将你之前的list内容放在这里
+    final List<Widget> apps = [
+      Text('Apple Music                                          £5.99🔔'),
+      Text('Amazon                                               £47.49✅'),
+      Text('Google Drive                                         £8.99✅'),
+      Text('iCloud                                                    £5.99✅'),
+      Text('Netflix                                                  £17.99🔔'),
+    ];
+
     return ListView.builder(
       itemCount: apps.length,
       itemBuilder: (context, index) {
@@ -57,5 +101,12 @@ class MainListView extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class CommunityNews extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text('Community News');
   }
 }
