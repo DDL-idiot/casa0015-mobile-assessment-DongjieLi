@@ -5,7 +5,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +21,18 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key? key}) : super(key: key);
+  const MainScreen({Key? key}) : super(key: key);
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 1; // 默认选中Home
+  int _selectedIndex = 1;
 
   static final List<Widget> _widgetOptions = <Widget>[
     PersonalCenter(),
-    SubscriptionList(), // 使用之前定义的list
+    SubscriptionList(),
     CommunityNews(),
   ];
 
@@ -52,13 +52,16 @@ class _MainScreenState extends State<MainScreen> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
             label: 'Personal',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Image.asset(
+                'ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png',
+                width: 24,
+                height: 24),
             label: 'Home',
           ),
           BottomNavigationBarItem(
@@ -84,7 +87,6 @@ class PersonalCenter extends StatelessWidget {
 class SubscriptionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // 将你之前的list内容放在这里
     final List<Widget> apps = [
       Text('Apple Music                                          £5.99🔔'),
       Text('Amazon                                               £47.49✅'),
