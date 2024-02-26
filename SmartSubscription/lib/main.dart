@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,6 +20,53 @@ class MyApp extends StatelessWidget {
       ),
       home: MainScreen(),
     );
+  }
+}
+
+class DatabaseHelper {
+  static final _databaseName = "SubscriptionsDatabase.db";
+  static final _databaseVersion = 1;
+  static final table = 'subscriptions';
+
+  static final columnId = '_id';
+  static final columnName = 'productName';
+  static final columnCost = 'cost';
+  static final columnBillingCycle = 'billingCycle';
+  static final columnSubscriptionDate = 'subscriptionDate';
+
+  // 单例模式
+  DatabaseHelper._privateConstructor();
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+
+  static Database? _database;
+  Future<Database> get database async => _database ??= await _initDatabase();
+
+  Future<Database> _initDatabase() async {
+    String path = join(await getDatabasesPath(), _databaseName);
+    return await openDatabase(path,
+        version: _databaseVersion, onCreate: _onCreate);
+  }
+
+  Future _onCreate(Database db, int version) async {
+    await db.execute('''
+          CREATE TABLE $table (
+            $columnId INTEGER PRIMARY KEY,
+            $columnName TEXT NOT NULL,
+            $columnCost REAL NOT NULL,
+            $columnBillingCycle TEXT NOT NULL,
+            $columnSubscriptionDate TEXT NOT NULL
+          )
+          ''');
+  }
+
+  Future<int> insert(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert(table, row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllRows() async {
+    Database db = await instance.database;
+    return await db.query(table);
   }
 }
 
@@ -64,6 +113,29 @@ class Subscription {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 1;
   List<Subscription> _subscriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSubscriptionsFromDatabase();
+  }
+
+  void _loadSubscriptionsFromDatabase() async {
+    final allRows = await DatabaseHelper.instance.queryAllRows();
+    List<Subscription> loadedSubscriptions = allRows
+        .map((row) => Subscription(
+              productName: row[DatabaseHelper.columnName],
+              cost: row[DatabaseHelper.columnCost],
+              billingCycle: row[DatabaseHelper.columnBillingCycle],
+              subscriptionDate:
+                  DateTime.parse(row[DatabaseHelper.columnSubscriptionDate]),
+            ))
+        .toList();
+
+    setState(() {
+      _subscriptions = loadedSubscriptions;
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -203,15 +275,23 @@ class _AddSubscriptionPageState extends State<AddSubscriptionPage> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState?.save();
-                  // 创建并返回一个新的 Subscription 对象
-                  Navigator.pop(
-                      context,
-                      Subscription(
-                        productName: productName,
-                        cost: cost,
-                        billingCycle: billingCycle,
-                        subscriptionDate: subscriptionDate,
-                      ));
+                  // 创建 Subscription 对象
+                  Subscription newSubscription = Subscription(
+                    productName: productName,
+                    cost: cost,
+                    billingCycle: billingCycle,
+                    subscriptionDate: subscriptionDate,
+                  );
+                  // 调用方法将订阅信息保存到数据库
+                  DatabaseHelper.instance.insert({
+                    DatabaseHelper.columnName: newSubscription.productName,
+                    DatabaseHelper.columnCost: newSubscription.cost,
+                    DatabaseHelper.columnBillingCycle:
+                        newSubscription.billingCycle,
+                    DatabaseHelper.columnSubscriptionDate:
+                        newSubscription.subscriptionDate.toIso8601String(),
+                  });
+                  Navigator.pop(context, newSubscription);
                 }
               },
             ),
