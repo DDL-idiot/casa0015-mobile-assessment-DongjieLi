@@ -1,9 +1,17 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -21,6 +29,29 @@ class MyApp extends StatelessWidget {
       home: MainScreen(),
     );
   }
+}
+
+Future<User?> signInWithGoogle() async {
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+  final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+
+  if (googleSignInAccount != null) {
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+    );
+
+    final UserCredential authResult =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    final User? user = authResult.user;
+
+    if (user != null) {
+      return user; // 登录成功
+    }
+  }
+  return null; // 登录失败
 }
 
 class DatabaseHelper {
@@ -113,11 +144,25 @@ class Subscription {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 1;
   List<Subscription> _subscriptions = [];
+  User? _currentUser;
+  bool _isSigningIn = false;
 
   @override
   void initState() {
     super.initState();
+    _signInOnStartup();
     _loadSubscriptionsFromDatabase();
+  }
+
+  void _signInOnStartup() async {
+    setState(() {
+      _isSigningIn = true;
+    });
+    User? user = await signInWithGoogle();
+    setState(() {
+      _currentUser = user;
+      _isSigningIn = false;
+    });
   }
 
   void _loadSubscriptionsFromDatabase() async {
@@ -159,6 +204,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     // 动态构建 _widgetOptions
+    // ignore: unused_local_variable
     final List<Widget> _widgetOptions = <Widget>[
       PersonalCenter(),
       SubscriptionList(
@@ -170,16 +216,36 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text('Smart Subscriptions'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              _navigateAndDisplaySubscriptionForm(context);
-            },
-          ),
+          if (_currentUser != null)
+            IconButton(
+              icon: Icon(Icons.exit_to_app),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                setState(() {
+                  _currentUser = null;
+                });
+              },
+            ),
         ],
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: _isSigningIn
+            ? CircularProgressIndicator()
+            : _currentUser != null
+                ? Text('Welcome, ${_currentUser!.displayName}')
+                : ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _isSigningIn = true;
+                      });
+                      User? user = await signInWithGoogle();
+                      setState(() {
+                        _currentUser = user;
+                        _isSigningIn = false;
+                      });
+                    },
+                    child: Text('Sign in with Google'),
+                  ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
