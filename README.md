@@ -1,10 +1,16 @@
-## SS-Smart Subscriptions
-“Smart Subscriptions” is a comprehensive subscription management platform designed to help users efficiently track and manage all their online and offline subscription services.
-My app makes subscription management simple and intuitive by automatically syncing users' subscription information, charges, and renewal dates.
+# smartsubscriptions
 
-## APP-Screenshot 
-![localimage](homepage.png "Simulator Screenshot")
+A new Flutter project.
 
-## Connected Environment
-Implement geofencing technology to trigger notifications about subscription services when users enter a specific geographic area. For example, when they walk by a concert hall, they might receive a notification about a subscription for upcoming events.
-Partner with local businesses to offer exclusive subscription deals when users are nearby, such as coffee shop loyalty programs or local gym trials.
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

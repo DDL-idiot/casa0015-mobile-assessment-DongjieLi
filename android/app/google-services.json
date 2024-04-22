@@ -1,41 +1,48 @@
 {
   "project_info": {
-    "project_number": "270216657991",
-    "firebase_url": "https://smart-subscription-default-rtdb.firebaseio.com",
-    "project_id": "smart-subscription",
-    "storage_bucket": "smart-subscription.appspot.com"
+    "project_number": "59276231533",
+    "project_id": "smartsubscriptions-baa50",
+    "storage_bucket": "smartsubscriptions-baa50.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:270216657991:android:d137239867028655424562",
+        "mobilesdk_app_id": "1:59276231533:android:ac5bdbd6550f3da14a5064",
         "android_client_info": {
-          "package_name": "com.example.myfirstapp"
+          "package_name": "com.example.smartsubscriptions"
         }
       },
       "oauth_client": [
         {
-          "client_id": "270216657991-uo7p35jkesa1bdmcuded5cnetdrcpq65.apps.googleusercontent.com",
+          "client_id": "59276231533-bi0uiieca8ujo3f7qqmpv3m8j7eagk3p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smartsubscriptions",
+            "certificate_hash": "133fa546093e349d8636703750680ce99eccf92f"
+          }
+        },
+        {
+          "client_id": "59276231533-10p5aq8m7unb6deq0fpou2a3bh9fng27.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDQt9cFyXwpe_sJrcVGNRitMVMj23JjM9A"
+          "current_key": "AIzaSyAoFeEgNlmN2oS_O7VN9kyZ6txCgJnz5jw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "270216657991-uo7p35jkesa1bdmcuded5cnetdrcpq65.apps.googleusercontent.com",
+              "client_id": "59276231533-10p5aq8m7unb6deq0fpou2a3bh9fng27.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "270216657991-60knuv6kjvs2epv7t6okj2kvo0nb25hi.apps.googleusercontent.com",
+              "client_id": "59276231533-m2envaikjqf53i5frvcp4ceunju4mn82.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.myfirstapp"
+                "bundle_id": "com.example.smartsubscriptions"
               }
             }
           ]

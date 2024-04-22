@@ -1,6 +1,6 @@
 {
-    "name": "myfirstapp",
-    "short_name": "myfirstapp",
+    "name": "smartsubscriptions",
+    "short_name": "smartsubscriptions",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

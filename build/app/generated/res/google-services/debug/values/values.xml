@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">59276231533-10p5aq8m7unb6deq0fpou2a3bh9fng27.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">59276231533</string>
+    <string name="google_api_key" translatable="false">AIzaSyAoFeEgNlmN2oS_O7VN9kyZ6txCgJnz5jw</string>
+    <string name="google_app_id" translatable="false">1:59276231533:android:ac5bdbd6550f3da14a5064</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAoFeEgNlmN2oS_O7VN9kyZ6txCgJnz5jw</string>
+    <string name="google_storage_bucket" translatable="false">smartsubscriptions-baa50.appspot.com</string>
+    <string name="project_id" translatable="false">smartsubscriptions-baa50</string>
+</resources>

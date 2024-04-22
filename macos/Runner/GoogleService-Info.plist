@@ -2,22 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>270216657991-brrnaqt09hu58us3obc3bu7qt4ein007.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.270216657991-brrnaqt09hu58us3obc3bu7qt4ein007</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBQbvHYtdKuqlBc7ExhaFQ7CZ2RkSekMxE</string>
+	<string>AIzaSyBlqBCZ435dZzmPmNoX2QLAoAVG9QK_dC0</string>
 	<key>GCM_SENDER_ID</key>
-	<string>270216657991</string>
+	<string>59276231533</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.myfirstapp.RunnerTests</string>
+	<string>com.example.smartsubscriptions</string>
 	<key>PROJECT_ID</key>
-	<string>smart-subscription</string>
+	<string>smartsubscriptions-baa50</string>
 	<key>STORAGE_BUCKET</key>
-	<string>smart-subscription.appspot.com</string>
+	<string>smartsubscriptions-baa50.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:270216657991:ios:a5bb1f767a8ff7bf424562</string>
-	<key>DATABASE_URL</key>
-	<string>https://smart-subscription-default-rtdb.firebaseio.com</string>
+	<string>1:59276231533:ios:a0c9a64cc0ec33844a5064</string>
 </dict>
 </plist>
