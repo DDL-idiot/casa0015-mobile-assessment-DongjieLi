@@ -24,3 +24,11 @@ Instantly notify users about subscription updates, offers and alerts to increase
 ## Here is a video introduction:
 
 ![Video Introduction](test.mp4)
+
+## Here are some screenshots of key functions:
+
+![Local Image](./homepage.png)
+![Local Image](./Statistics.png)
+![Local Image](./SubscriptionsNews.png)
+![Local Image](./Subsnearu.png)
+
