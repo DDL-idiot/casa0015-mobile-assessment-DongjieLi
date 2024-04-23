@@ -58,6 +58,7 @@ MERGED from [:flutter_plugin_android_lifecycle] /Users/ddlidiot/Downloads/Mobile
 MERGED from [:google_sign_in_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/google_sign_in_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-11:12
 MERGED from [:path_provider_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
 MERGED from [:shared_preferences_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/shared_preferences_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
+MERGED from [:webview_flutter_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/webview_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.firebase:firebase-auth:22.3.1] /Users/ddlidiot/.gradle/caches/transforms-3/836da7df3e22b02c5576fbb42cb79769/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:17:1-75:12
 MERGED from [com.google.firebase:firebase-firestore:24.11.0] /Users/ddlidiot/.gradle/caches/transforms-3/91abcd3326700b000078eab51f3e6922/transformed/jetified-firebase-firestore-24.11.0/AndroidManifest.xml:2:1-26:12
 MERGED from [com.google.firebase:firebase-common-ktx:20.4.3] /Users/ddlidiot/.gradle/caches/transforms-3/e2ccd95d36272f38da6760596f0386d9/transformed/jetified-firebase-common-ktx-20.4.3/AndroidManifest.xml:2:1-18:12
@@ -82,6 +83,7 @@ MERGED from [androidx.activity:activity:1.5.1] /Users/ddlidiot/.gradle/caches/tr
 MERGED from [androidx.loader:loader:1.1.0] /Users/ddlidiot/.gradle/caches/transforms-3/2a7dd560a7123d8e3be8655a6fd9c9b4/transformed/loader-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.5.1] /Users/ddlidiot/.gradle/caches/transforms-3/c744fb48f05c2e6e390008c7c231d85f/transformed/lifecycle-viewmodel-2.5.1/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1] /Users/ddlidiot/.gradle/caches/transforms-3/f44450c32e62b5606a64af92465a2398/transformed/jetified-lifecycle-viewmodel-savedstate-2.5.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.webkit:webkit:1.5.0] /Users/ddlidiot/.gradle/caches/transforms-3/9442fd55e7a7c97307b56fb672335bc9/transformed/webkit-1.5.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.tracing:tracing:1.0.0] /Users/ddlidiot/.gradle/caches/transforms-3/16d1477e63fc8152985fe656d6ad15be/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.browser:browser:1.4.0] /Users/ddlidiot/.gradle/caches/transforms-3/23224399ec4190eeaf63cea702b39d94/transformed/browser-1.4.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/ddlidiot/.gradle/caches/transforms-3/52f11406fe700b81f8be977cdbb3bfb8/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
@@ -186,6 +188,8 @@ MERGED from [:path_provider_android] /Users/ddlidiot/Downloads/MobileSys/smartsu
 MERGED from [:path_provider_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:shared_preferences_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/shared_preferences_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:shared_preferences_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/shared_preferences_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:webview_flutter_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/webview_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:webview_flutter_android] /Users/ddlidiot/Downloads/MobileSys/smartsubscriptions/build/webview_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [com.google.firebase:firebase-auth:22.3.1] /Users/ddlidiot/.gradle/caches/transforms-3/836da7df3e22b02c5576fbb42cb79769/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:21:5-23:64
 MERGED from [com.google.firebase:firebase-auth:22.3.1] /Users/ddlidiot/.gradle/caches/transforms-3/836da7df3e22b02c5576fbb42cb79769/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:21:5-23:64
 MERGED from [com.google.firebase:firebase-firestore:24.11.0] /Users/ddlidiot/.gradle/caches/transforms-3/91abcd3326700b000078eab51f3e6922/transformed/jetified-firebase-firestore-24.11.0/AndroidManifest.xml:6:5-44
@@ -234,6 +238,8 @@ MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.5.1] /Users/ddlidiot/.grad
 MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.5.1] /Users/ddlidiot/.gradle/caches/transforms-3/c744fb48f05c2e6e390008c7c231d85f/transformed/lifecycle-viewmodel-2.5.1/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1] /Users/ddlidiot/.gradle/caches/transforms-3/f44450c32e62b5606a64af92465a2398/transformed/jetified-lifecycle-viewmodel-savedstate-2.5.1/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1] /Users/ddlidiot/.gradle/caches/transforms-3/f44450c32e62b5606a64af92465a2398/transformed/jetified-lifecycle-viewmodel-savedstate-2.5.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.webkit:webkit:1.5.0] /Users/ddlidiot/.gradle/caches/transforms-3/9442fd55e7a7c97307b56fb672335bc9/transformed/webkit-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.webkit:webkit:1.5.0] /Users/ddlidiot/.gradle/caches/transforms-3/9442fd55e7a7c97307b56fb672335bc9/transformed/webkit-1.5.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.tracing:tracing:1.0.0] /Users/ddlidiot/.gradle/caches/transforms-3/16d1477e63fc8152985fe656d6ad15be/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.tracing:tracing:1.0.0] /Users/ddlidiot/.gradle/caches/transforms-3/16d1477e63fc8152985fe656d6ad15be/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.browser:browser:1.4.0] /Users/ddlidiot/.gradle/caches/transforms-3/23224399ec4190eeaf63cea702b39d94/transformed/browser-1.4.0/AndroidManifest.xml:20:5-22:41

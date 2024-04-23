@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.smartsubscriptions.app-mergeDebugResources-24:/values-my/values-my.xml",
+            "outputFile": "com.example.smartsubscriptions.app-mergeDebugResources-25:/values-my/values-my.xml",
             "map": [
                 {
                     "source": "/Users/ddlidiot/.gradle/caches/transforms-3/23224399ec4190eeaf63cea702b39d94/transformed/browser-1.4.0/res/values-my/values-my.xml",

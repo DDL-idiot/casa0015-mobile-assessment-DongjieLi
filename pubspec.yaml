@@ -46,6 +46,7 @@ dependencies:
   date_utils: ^0.2.0
   google_maps_flutter: ^2.6.1
   google_maps_webservice: ^0.0.20-nullsafety.5
+  webview_flutter: ^2.0.12
 
 dev_dependencies:
   flutter_test:

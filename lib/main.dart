@@ -12,6 +12,9 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:webview_flutter/webview_flutter.dart';
 
 void onBackgroundNotification(NotificationResponse notificationResponse) {}
 
@@ -124,7 +127,6 @@ class Subscription {
 
   factory Subscription.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    print("Converting document: ${doc.id} with data: $data");
     return Subscription(
       id: doc.id,
       productName: data['productName'],
@@ -203,10 +205,8 @@ Future<List<Subscription>> loadSubscriptionsFromFirestore(String userId) async {
         .doc(userId)
         .collection('subscriptions')
         .get();
-    print("Firestore query completed with data count: ${snapshot.docs.length}");
     return snapshot.docs.map((doc) => Subscription.fromFirestore(doc)).toList();
   } catch (e) {
-    print("Error loading subscriptions for user $userId: $e");
     return [];
   }
 }
@@ -245,7 +245,6 @@ class _MainScreenState extends State<MainScreen> {
   void _signInOnStartup() async {
     User? user = await signInWithGoogle();
     if (user != null) {
-      print("Signed in as: ${user.uid}");
       setState(() {
         _currentUser = user;
       });
@@ -263,11 +262,9 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> loadSubscriptions() async {
     if (_currentUser != null) {
-      print("Loading subscriptions for user ID: ${_currentUser!.uid}");
       final userId = _currentUser!.uid;
       final List<Subscription> subs =
           await loadSubscriptionsFromFirestore(userId);
-      print("Loaded subscriptions count: ${subs.length}");
       setState(() {
         _subscriptions = subs;
         // 如果 PersonalCenter 是 MainScreen 的子组件，并且通过构造器传递 _subscriptions，此处无需其他操作
@@ -307,7 +304,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _updateAllSubscriptions() async {
-    print("Current user: ${FirebaseAuth.instance.currentUser?.uid}");
     if (_currentUser == null) {
       print("No user signed in.");
       return;
@@ -414,7 +410,10 @@ class _MainScreenState extends State<MainScreen> {
         actions.add(IconButton(
           icon: Icon(Icons.analytics),
           onPressed: () {
-            // Navigate to analytics screen
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>
+                  AnalysisScreen(subscriptions: _subscriptions),
+            ));
           },
           tooltip: 'Analytics',
         ));
@@ -424,7 +423,10 @@ class _MainScreenState extends State<MainScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Smart Subscriptions'),
+            Padding(
+              padding: EdgeInsets.only(top: 9.0),
+              child: Text('Smart Subscriptions'),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -454,23 +456,19 @@ class _MainScreenState extends State<MainScreen> {
         ));
         break;
       case 2: // Community Tab
-        titleWidget = Text("");
-        actions.addAll([
+        titleWidget = Text("Community");
+        actions = [
           IconButton(
             icon: Icon(Icons.newspaper),
             onPressed: () {
               // Navigate to news page
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => NewsPage(),
+              ));
             },
             tooltip: 'News',
           ),
-          IconButton(
-            icon: Icon(Icons.group),
-            onPressed: () {
-              // This is already the community page
-            },
-            tooltip: 'Community',
-          ),
-        ]);
+        ];
         break;
     }
 
@@ -1230,8 +1228,6 @@ class _PersonalCenterState extends State<PersonalCenter> {
   }
 
   Future<Map<String, double>> _fetchCategoryData() async {
-    print("Subscriptions: ${widget.subscriptions}");
-    print("Total subscriptions: ${widget.subscriptions.length}"); // 打印总订阅数
     Map<String, int> categoryCounts = {};
 
     for (var subscription in widget.subscriptions) {
@@ -1244,8 +1240,6 @@ class _PersonalCenterState extends State<PersonalCenter> {
     if (total > 0) {
       categoryCounts.forEach((key, value) {
         categoryPercentages[key] = (value / total) * 100;
-        print(
-            "Category: $key, Percentage: ${categoryPercentages[key]}"); // 打印每个类别的百分比
       });
     } else {
       print("No data to display"); // 如果没有订阅数据
@@ -1494,5 +1488,173 @@ class _CommunityNewsState extends State<CommunityNews> {
         print("Failed to fetch places: ${result.errorMessage}");
       }
     });
+  }
+}
+
+class AnalysisScreen extends StatefulWidget {
+  final List<Subscription> subscriptions;
+
+  const AnalysisScreen({Key? key, required this.subscriptions})
+      : super(key: key);
+
+  @override
+  _AnalysisScreenState createState() => _AnalysisScreenState();
+}
+
+class _AnalysisScreenState extends State<AnalysisScreen> {
+  String _analysisResult = "Loading analysis...";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAnalysis();
+  }
+
+  void _fetchAnalysis() async {
+    var prompt = _generatePrompt(widget.subscriptions);
+    var response = await _callOpenAIAPI(prompt);
+    setState(() {
+      _analysisResult = response;
+    });
+  }
+
+  String _generatePrompt(List<Subscription> subscriptions) {
+    // Combine all subscription data into a formatted string
+    String data = subscriptions
+        .map((sub) =>
+            "${sub.productName} costs ${sub.cost} every ${sub.billingCycle} and falls under ${sub.category}.")
+        .join(" ");
+    return "Provide a detailed analysis of the following subscriptions: $data";
+  }
+
+  Future<String> _callOpenAIAPI(String prompt) async {
+    var apiKey = 'sk-proj-jV79N6OaGc7nsYLBcAiRT3BlbkFJ8ZKQ5HwHBEd2nE9gbkQK';
+    var url = 'https://api.openai.com/v1/chat/completions';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $apiKey'
+    };
+    var body = json.encode({
+      'model': 'gpt-3.5-turbo',
+      'messages': [
+        {
+          'role': 'system',
+          'content': 'Please help me analyse these subscription data.'
+        },
+        {'role': 'user', 'content': prompt}
+      ],
+      'max_tokens': 700,
+      'temperature': 0.5
+    });
+
+    var response =
+        await http.post(Uri.parse(url), headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return jsonResponse['choices'][0]['message']['content'];
+    } else {
+      print('Failed with status code: ${response.statusCode}');
+      return "Failed to load analysis.";
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Subscription Analysis')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(_analysisResult),
+        ),
+      ),
+    );
+  }
+}
+
+class NewsPage extends StatefulWidget {
+  @override
+  _NewsPageState createState() => _NewsPageState();
+}
+
+class _NewsPageState extends State<NewsPage> {
+  Future<List<Map<String, dynamic>>> _fetchNews() async {
+    var response = await http.get(
+      Uri.parse(
+          'https://www.googleapis.com/customsearch/v1?q=subscriptions+special+offer&key=AIzaSyCN-rtWmv_UI95q0i4PEOXrRh35SNgQ9vE&cx=860c8c80233ad4899'),
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      List<Map<String, dynamic>> newsItems = [];
+      for (var item in data['items']) {
+        newsItems.add({'title': item['title'], 'link': item['link']});
+      }
+      return newsItems;
+    } else {
+      throw Exception('Failed to load news');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("News"),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _fetchNews(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              return ListView.separated(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  var item = snapshot.data![index];
+                  return ListTile(
+                    title: Text(item['title'],
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Tap to read more',
+                        style: TextStyle(color: Colors.grey[600])),
+                    leading: Icon(Icons.new_releases, color: Colors.blue[700]),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NewsWebView(url: item['link']),
+                        ),
+                      );
+                    },
+                    tileColor: index % 2 == 0 ? Colors.blue[50] : Colors.white,
+                  );
+                },
+                separatorBuilder: (context, index) => Divider(),
+              );
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+          }
+          return CircularProgressIndicator();
+        },
+      ),
+    );
+  }
+}
+
+class NewsWebView extends StatelessWidget {
+  final String url;
+
+  const NewsWebView({Key? key, required this.url}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('News Detail')),
+      body: WebView(
+        initialUrl: url,
+        javascriptMode: JavascriptMode.unrestricted,
+      ),
+    );
   }
 }

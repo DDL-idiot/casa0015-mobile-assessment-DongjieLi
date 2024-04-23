@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.smartsubscriptions.app-mergeDebugResources-24:/values-uk/values-uk.xml",
+            "outputFile": "com.example.smartsubscriptions.app-mergeDebugResources-25:/values-uk/values-uk.xml",
             "map": [
                 {
                     "source": "/Users/ddlidiot/.gradle/caches/transforms-3/3ddf75687a83daf17467e41f7acd5126/transformed/core-1.8.0/res/values-uk/values-uk.xml",
