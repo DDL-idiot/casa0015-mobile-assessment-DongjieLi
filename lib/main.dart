@@ -990,10 +990,11 @@ class SubscriptionList extends StatelessWidget {
   final void Function(BuildContext, Subscription) onEdit;
   final Function(Subscription) onToggleReminder;
 
-  SubscriptionList(
-      {required this.subscriptions,
-      required this.onEdit,
-      required this.onToggleReminder});
+  SubscriptionList({
+    required this.subscriptions,
+    required this.onEdit,
+    required this.onToggleReminder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1001,20 +1002,38 @@ class SubscriptionList extends StatelessWidget {
       itemCount: subscriptions.length,
       itemBuilder: (context, index) {
         final subscription = subscriptions[index];
-        return GestureDetector(
-          onDoubleTap: () => onToggleReminder(subscription),
+        return Card(
+          elevation: 2,
+          margin: EdgeInsets.all(8),
           child: ListTile(
-            title: Text(subscription.productName),
+            title: Text(
+              subscription.productName,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Text(
-              'Cost: £${subscription.cost}, Next Billing Date: ${DateFormat('yyyy-MM-dd').format(subscription.nextBillingDate)}',
+              'Cost: £${subscription.cost.toStringAsFixed(2)}, Next Billing Date: ${DateFormat('yyyy-MM-dd').format(subscription.nextBillingDate)}',
+              style: TextStyle(color: Colors.grey[600]),
             ),
-            trailing: Icon(
-              subscription.isReminded
-                  ? Icons.notifications_active
-                  : Icons.notifications_off,
-              color: subscription.isReminded ? Colors.green : null,
+            leading: Icon(
+              subscription.isActive ? Icons.check_circle_outline : Icons.cancel,
+              color: subscription.isActive ? Colors.green : Colors.red,
             ),
-            onLongPress: () => onEdit(context, subscription),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  subscription.isReminded
+                      ? Icons.notifications_active
+                      : Icons.notifications_off,
+                  color: subscription.isReminded ? Colors.green : Colors.grey,
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () => onEdit(context, subscription),
+                ),
+              ],
+            ),
+            onTap: () => onToggleReminder(subscription),
           ),
         );
       },
@@ -1436,7 +1455,7 @@ class _CommunityNewsState extends State<CommunityNews> {
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
-          target: LatLng(51.5082543, -0.0091798),
+          target: LatLng(51.5381783, -0.0100885),
           zoom: 14.0,
         ),
         markers: _markers,
@@ -1454,7 +1473,7 @@ class _CommunityNewsState extends State<CommunityNews> {
   }
 
   void _searchNearby() async {
-    final location = Location(lat: 51.5082543, lng: -0.0091798);
+    final location = Location(lat: 51.5381783, lng: -0.0100885);
     final result = await _places.searchNearbyWithRadius(location, 10000);
 
     setState(() {
