@@ -1,38 +1,30 @@
 [
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/drawable-v21_launch_background.xml.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/drawable-v21/launch_background.xml"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/mipmap-hdpi/ic_launcher.png"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/drawable-v21_launch_background.xml.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/drawable-v21/launch_background.xml"
     },
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/drawable_launchimage.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/drawable/launchimage.png"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/drawable-v21_launchimage.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/drawable-v21/launchimage.png"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/drawable-v21_launchimage.png.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/drawable-v21/launchimage.png"
     },
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/mipmap-xxhdpi/ic_launcher.png"
-    },
-    {
-        "merged": "com.example.smartsubscriptions.app-merged_res-25:/drawable-v21_launch_background.xml.flat",
-        "source": "com.example.smartsubscriptions.app-main-18:/drawable-v21/launch_background.xml"
-    },
-    {
-        "merged": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-merged_res-25:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "/Users/ddlidiot/.gradle/daemon/7.6.3/com.example.smartsubscriptions.app-main-18:/mipmap-mdpi/ic_launcher.png"
+        "merged": "com.example.smartsubscriptions.app-merged_res-26:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.example.smartsubscriptions.app-main-19:/mipmap-mdpi/ic_launcher.png"
     }
 ]

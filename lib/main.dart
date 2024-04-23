@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 
 void onBackgroundNotification(NotificationResponse notificationResponse) {}
 
@@ -85,7 +88,7 @@ class Subscription {
   final String productName;
   final double cost;
   final String billingCycle;
-  late final DateTime subscriptionDate;
+  DateTime subscriptionDate;
   bool isReminded;
   bool isActive;
   DateTime? lastBillingDate;
@@ -115,12 +118,13 @@ class Subscription {
     required this.subscriptionDate,
     this.isReminded = false,
     this.isActive = true,
-    this.lastBillingDate,
+    DateTime? lastBillingDate,
     this.category = '',
-  });
+  }) : lastBillingDate = lastBillingDate ?? subscriptionDate;
 
   factory Subscription.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    print("Converting document: ${doc.id} with data: $data");
     return Subscription(
       id: doc.id,
       productName: data['productName'],
@@ -136,12 +140,14 @@ class Subscription {
 
   bool updateBillingDates() {
     final now = DateTime.now();
-    DateTime calculatedNextBillingDate =
-        calculateNextBillingDate(lastBillingDate ?? subscriptionDate);
-    if (calculatedNextBillingDate.isBefore(now)) {
-      lastBillingDate = calculatedNextBillingDate;
-      DateTime newNextBillingDate = calculateNextBillingDate(lastBillingDate!);
-      subscriptionDate = newNextBillingDate;
+    if (!isActive) {
+      return false;
+    }
+
+    DateTime nextBillingDate = calculateNextBillingDate(lastBillingDate!);
+    if (now.isAfter(nextBillingDate) || now.isAtSameMomentAs(nextBillingDate)) {
+      lastBillingDate = nextBillingDate;
+      nextBillingDate = calculateNextBillingDate(lastBillingDate!);
       return true;
     }
     return false;
@@ -187,12 +193,22 @@ Future<void> addSubscriptionToFirestore(
 }
 
 Future<List<Subscription>> loadSubscriptionsFromFirestore(String userId) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(userId)
-      .collection('subscriptions')
-      .get();
-  return snapshot.docs.map((doc) => Subscription.fromFirestore(doc)).toList();
+  if (userId.isEmpty) {
+    print("Error: User ID is empty.");
+    return [];
+  }
+  try {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('subscriptions')
+        .get();
+    print("Firestore query completed with data count: ${snapshot.docs.length}");
+    return snapshot.docs.map((doc) => Subscription.fromFirestore(doc)).toList();
+  } catch (e) {
+    print("Error loading subscriptions for user $userId: $e");
+    return [];
+  }
 }
 
 Future<void> updateSubscriptionInFirestore(
@@ -220,6 +236,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await initializeCategories();
       _signInOnStartup();
       _updateAllSubscriptions();
     });
@@ -228,6 +245,7 @@ class _MainScreenState extends State<MainScreen> {
   void _signInOnStartup() async {
     User? user = await signInWithGoogle();
     if (user != null) {
+      print("Signed in as: ${user.uid}");
       setState(() {
         _currentUser = user;
       });
@@ -238,18 +256,32 @@ class _MainScreenState extends State<MainScreen> {
           duration: Duration(seconds: 3),
         ),
       );
+    } else {
+      print("Failed to sign in with Google.");
     }
   }
 
   Future<void> loadSubscriptions() async {
     if (_currentUser != null) {
+      print("Loading subscriptions for user ID: ${_currentUser!.uid}");
       final userId = _currentUser!.uid;
       final List<Subscription> subs =
           await loadSubscriptionsFromFirestore(userId);
+      print("Loaded subscriptions count: ${subs.length}");
       setState(() {
         _subscriptions = subs;
+        // 如果 PersonalCenter 是 MainScreen 的子组件，并且通过构造器传递 _subscriptions，此处无需其他操作
       });
+    } else {
+      print("No user signed in.");
     }
+  }
+
+  Future<void> initializeCategories() async {
+    var customCategories = await loadCustomCategories();
+    setState(() {
+      categories.addAll(customCategories.where((c) => !categories.contains(c)));
+    });
   }
 
   void _onItemTapped(int index) {
@@ -275,13 +307,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _updateAllSubscriptions() async {
+    print("Current user: ${FirebaseAuth.instance.currentUser?.uid}");
+    if (_currentUser == null) {
+      print("No user signed in.");
+      return;
+    }
     if (_subscriptions.isEmpty) {
       return;
     }
     bool needUpdate = false;
     for (var subscription in _subscriptions) {
       if (subscription.updateBillingDates()) {
-        await _saveSubscriptionUpdates(subscription);
+        await updateSubscriptionInFirestore(subscription, _currentUser!.uid);
         needUpdate = true;
       }
     }
@@ -373,7 +410,7 @@ class _MainScreenState extends State<MainScreen> {
 
     switch (_selectedIndex) {
       case 0: // Personal Tab
-        titleWidget = Text("");
+        titleWidget = Text("Statistics");
         actions.add(IconButton(
           icon: Icon(Icons.analytics),
           onPressed: () {
@@ -491,7 +528,8 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _selectedIndex,
         children: <Widget>[
-          PersonalCenter(),
+          PersonalCenter(
+              currentUser: _currentUser, subscriptions: _subscriptions),
           SubscriptionList(
             subscriptions: _subscriptions,
             onEdit: _editSubscription,
@@ -546,7 +584,7 @@ class _AddSubscriptionPageState extends State<AddSubscriptionPage> {
       context: context,
       initialDate: subscriptionDate,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
+      lastDate: DateTime(2100),
     );
     if (picked != null && picked != subscriptionDate) {
       setState(() {
@@ -693,6 +731,7 @@ class _EditSubscriptionPageState extends State<EditSubscriptionPage> {
         billingCycle: _billingCycle,
         subscriptionDate: _subscriptionDate,
         isActive: isActive,
+        isReminded: widget.subscription.isReminded,
         category: _category,
       );
       if (widget.currentUser != null) {
@@ -712,7 +751,7 @@ class _EditSubscriptionPageState extends State<EditSubscriptionPage> {
       context: context,
       initialDate: _subscriptionDate,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
+      lastDate: DateTime(2100),
     );
     if (picked != null && picked != _subscriptionDate) {
       setState(() {
@@ -868,10 +907,16 @@ Widget categoryDropdown(String currentValue, BuildContext context,
     ValueChanged<String?> onChanged) {
   return DropdownButtonFormField<String>(
     decoration: InputDecoration(labelText: 'Category'),
-    value: currentValue.isNotEmpty ? currentValue : null,
+    value: categories.contains(currentValue) ? currentValue : null,
     onChanged: (value) {
       if (value == "Custom") {
-        promptForCustomCategory(context, onChanged);
+        promptForCustomCategory(context, (newCategory) {
+          if (!categories.contains(newCategory)) {
+            categories.add(newCategory);
+            addCustomCategory(newCategory);
+          }
+          onChanged(newCategory);
+        });
       } else {
         onChanged(value);
       }
@@ -920,6 +965,26 @@ void promptForCustomCategory(
       );
     },
   );
+}
+
+Future<void> addCustomCategory(String category) async {
+  var categoriesCollection =
+      FirebaseFirestore.instance.collection('custom_categories');
+  await categoriesCollection.doc(category).set({'name': category});
+}
+
+Future<List<String>> loadCustomCategories() async {
+  try {
+    var categoriesCollection =
+        FirebaseFirestore.instance.collection('custom_categories');
+    var snapshot = await categoriesCollection.get();
+    List<String> categories =
+        snapshot.docs.map((doc) => doc.data()['name'].toString()).toList();
+    return categories;
+  } catch (e) {
+    print("Failed to load custom categories: $e");
+    return [];
+  }
 }
 
 class SubscriptionList extends StatelessWidget {
@@ -1131,23 +1196,303 @@ Future<void> scheduleNotification(Subscription subscription) async {
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-class PersonalCenter extends StatelessWidget {
+class PersonalCenter extends StatefulWidget {
+  final User? currentUser;
+  final List<Subscription> subscriptions;
+
+  PersonalCenter({Key? key, this.currentUser, required this.subscriptions})
+      : super(key: key);
+
+  @override
+  _PersonalCenterState createState() => _PersonalCenterState();
+}
+
+class _PersonalCenterState extends State<PersonalCenter> {
+  late Future<Map<String, double>> _categoryData;
+  late Future<Map<String, double>> _monthlyAverageData;
+  late Future<double> _totalMonthlyCost;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoryData = _fetchCategoryData();
+    _monthlyAverageData = _fetchMonthlyAverageCost();
+    _totalMonthlyCost = _fetchTotalMonthlyCost();
+  }
+
+  void didUpdateWidget(PersonalCenter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.subscriptions != oldWidget.subscriptions) {
+      _categoryData = _fetchCategoryData(); // 重新计算类别数据
+      _monthlyAverageData = _fetchMonthlyAverageCost(); // 重新计算月均费用
+      _totalMonthlyCost = _fetchTotalMonthlyCost(); // 重新计算总月费用
+    }
+  }
+
+  Future<Map<String, double>> _fetchCategoryData() async {
+    print("Subscriptions: ${widget.subscriptions}");
+    print("Total subscriptions: ${widget.subscriptions.length}"); // 打印总订阅数
+    Map<String, int> categoryCounts = {};
+
+    for (var subscription in widget.subscriptions) {
+      categoryCounts[subscription.category] =
+          (categoryCounts[subscription.category] ?? 0) + 1;
+    }
+
+    int total = widget.subscriptions.length;
+    Map<String, double> categoryPercentages = {};
+    if (total > 0) {
+      categoryCounts.forEach((key, value) {
+        categoryPercentages[key] = (value / total) * 100;
+        print(
+            "Category: $key, Percentage: ${categoryPercentages[key]}"); // 打印每个类别的百分比
+      });
+    } else {
+      print("No data to display"); // 如果没有订阅数据
+    }
+
+    return categoryPercentages;
+  }
+
+  Future<Map<String, double>> _fetchMonthlyAverageCost() async {
+    Map<String, double> categoryMonthlyCosts = {};
+
+    for (var subscription in widget.subscriptions) {
+      String category = subscription.category;
+      double monthlyCost =
+          subscription.cost / _getMonthlyDivisor(subscription.billingCycle);
+      categoryMonthlyCosts[category] =
+          (categoryMonthlyCosts[category] ?? 0) + monthlyCost;
+    }
+
+    return categoryMonthlyCosts;
+  }
+
+  int _getMonthlyDivisor(String billingCycle) {
+    switch (billingCycle.toLowerCase()) {
+      case 'monthly':
+        return 1;
+      case 'quarterly':
+        return 3;
+      case 'half yearly':
+        return 6;
+      case 'yearly':
+        return 12;
+      default:
+        return 1; // Default to monthly if unrecognized
+    }
+  }
+
+  Future<double> _fetchTotalMonthlyCost() async {
+    double totalMonthlyCost = 0;
+    Map<String, double> monthlyCosts = await _fetchMonthlyAverageCost();
+    monthlyCosts.forEach((key, value) {
+      totalMonthlyCost += value;
+    });
+    return totalMonthlyCost;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text('Personal Center'),
-        ],
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 700, // 分配足够的空间给饼图，避免截断
+              padding: const EdgeInsets.all(10.0), // 留出边距
+              child: FutureBuilder<Map<String, double>>(
+                future: _categoryData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      return PieChartPage(data: snapshot.data!);
+                    } else {
+                      return Text("No data available");
+                    }
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
+            ListTile(
+              title: Text('Monthly Average Costs by Category'),
+              subtitle: FutureBuilder<Map<String, double>>(
+                future: _monthlyAverageData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: snapshot.data!.entries
+                          .map((entry) => Text(
+                              '${entry.key}: £${entry.value.toStringAsFixed(2)}'))
+                          .toList(),
+                    );
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
+            FutureBuilder<double>(
+              future: _totalMonthlyCost,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return ListTile(
+                    title: Text(
+                      'Total Monthly Cost',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      '£${snapshot.data!.toStringAsFixed(2)}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }
+                return CircularProgressIndicator();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class CommunityNews extends StatelessWidget {
+class PieChartWidget extends StatelessWidget {
+  final Map<String, double> data;
+
+  PieChartWidget({Key? key, required this.data}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Text('Community News');
+    List<PieChartSectionData> sections = data.entries.map((entry) {
+      return PieChartSectionData(
+        color: Colors.primaries[
+            data.keys.toList().indexOf(entry.key) % Colors.primaries.length],
+        value: entry.value,
+        title: '${entry.key}',
+        radius: 75,
+        titleStyle: TextStyle(
+            fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+        titlePositionPercentageOffset: 0.55,
+      );
+    }).toList();
+
+    return PieChart(
+      PieChartData(
+        sections: sections,
+        centerSpaceRadius: 35,
+        sectionsSpace: 2,
+        // pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+        // }),
+      ),
+    );
+  }
+}
+
+class PieChartPage extends StatelessWidget {
+  final Map<String, double> data;
+
+  PieChartPage({Key? key, required this.data}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: PieChartWidget(data: data),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: data.entries.map((entry) {
+              return ListTile(
+                leading: Icon(Icons.circle,
+                    color: Colors.primaries[
+                        data.keys.toList().indexOf(entry.key) %
+                            Colors.primaries.length]),
+                title: Text('${entry.key}'),
+                trailing: Text('${entry.value.toStringAsFixed(1)}%'),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CommunityNews extends StatefulWidget {
+  @override
+  _CommunityNewsState createState() => _CommunityNewsState();
+}
+
+class _CommunityNewsState extends State<CommunityNews> {
+  // ignore: unused_field
+  GoogleMapController? _controller;
+  Set<Marker> _markers = {};
+  final _places =
+      GoogleMapsPlaces(apiKey: "AIzaSyCeEOjxJg1NYtJX5iK0Cy8hfaRJ-q2XzWU");
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(51.5082543, -0.0091798),
+          zoom: 14.0,
+        ),
+        markers: _markers,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _searchNearby,
+        tooltip: 'Search Nearby',
+        child: Icon(Icons.search),
+      ),
+    );
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    _controller = controller;
+  }
+
+  void _searchNearby() async {
+    final location = Location(lat: 51.5082543, lng: -0.0091798);
+    final result = await _places.searchNearbyWithRadius(location, 10000);
+
+    setState(() {
+      _markers.clear();
+      if (result.status == "OK") {
+        for (var place in result.results) {
+          final lat = place.geometry?.location.lat;
+          final lng = place.geometry?.location.lng;
+          final types = place.types;
+          if (lat != null && lng != null) {
+            if (types.contains('gym') ||
+                types.contains('movie_theater') ||
+                types.contains('theater') ||
+                types.contains('art_gallery') ||
+                types.contains('museum') ||
+                types.contains('spa') ||
+                types.contains('golf_course') ||
+                types.contains('amusement_park')) {
+              _markers.add(
+                Marker(
+                  markerId: MarkerId(place.placeId),
+                  position: LatLng(lat, lng),
+                  infoWindow:
+                      InfoWindow(title: place.name, snippet: place.vicinity),
+                ),
+              );
+            }
+          }
+        }
+      } else {
+        print("Failed to fetch places: ${result.errorMessage}");
+      }
+    });
   }
 }

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.smartsubscriptions.app-mergeDebugResources-23:/values-nl/values-nl.xml",
+            "outputFile": "com.example.smartsubscriptions.app-mergeDebugResources-24:/values-nl/values-nl.xml",
             "map": [
                 {
                     "source": "/Users/ddlidiot/.gradle/caches/transforms-3/bdf8de6991d39692c9aac6cab85ade6f/transformed/jetified-play-services-basement-18.3.0/res/values-nl/values.xml",
