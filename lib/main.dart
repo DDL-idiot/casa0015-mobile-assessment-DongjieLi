@@ -267,7 +267,6 @@ class _MainScreenState extends State<MainScreen> {
           await loadSubscriptionsFromFirestore(userId);
       setState(() {
         _subscriptions = subs;
-        // 如果 PersonalCenter 是 MainScreen 的子组件，并且通过构造器传递 _subscriptions，此处无需其他操作
       });
     } else {
       print("No user signed in.");
@@ -461,7 +460,6 @@ class _MainScreenState extends State<MainScreen> {
           IconButton(
             icon: Icon(Icons.newspaper),
             onPressed: () {
-              // Navigate to news page
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => NewsPage(),
               ));
@@ -1240,9 +1238,9 @@ class _PersonalCenterState extends State<PersonalCenter> {
   void didUpdateWidget(PersonalCenter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.subscriptions != oldWidget.subscriptions) {
-      _categoryData = _fetchCategoryData(); // 重新计算类别数据
-      _monthlyAverageData = _fetchMonthlyAverageCost(); // 重新计算月均费用
-      _totalMonthlyCost = _fetchTotalMonthlyCost(); // 重新计算总月费用
+      _categoryData = _fetchCategoryData();
+      _monthlyAverageData = _fetchMonthlyAverageCost();
+      _totalMonthlyCost = _fetchTotalMonthlyCost();
     }
   }
 
@@ -1261,7 +1259,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
         categoryPercentages[key] = (value / total) * 100;
       });
     } else {
-      print("No data to display"); // 如果没有订阅数据
+      print("No data to display");
     }
 
     return categoryPercentages;
@@ -1292,7 +1290,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
       case 'yearly':
         return 12;
       default:
-        return 1; // Default to monthly if unrecognized
+        return 1;
     }
   }
 
@@ -1312,8 +1310,8 @@ class _PersonalCenterState extends State<PersonalCenter> {
         child: Column(
           children: <Widget>[
             Container(
-              height: 700, // 分配足够的空间给饼图，避免截断
-              padding: const EdgeInsets.all(10.0), // 留出边距
+              height: 700,
+              padding: const EdgeInsets.all(10.0),
               child: FutureBuilder<Map<String, double>>(
                 future: _categoryData,
                 builder: (context, snapshot) {
